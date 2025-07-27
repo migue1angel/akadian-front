@@ -1,0 +1,62 @@
+<div class="min-h-full flex items-center justify-center bg-gray-100">
+  <p-card title="Welcome Back" class="w-full max-w-md">
+    <p-fluid>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="field mb-4">
+          <label for="email" class="block text-gray-700 text-sm font-bold mb-2"
+            >Email</label
+          >
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>
+            <input
+              id="email"
+              type="text"
+              pInputText
+              formControlName="email"
+              placeholder="Enter your email"
+            />
+          </div>
+        </div>
+
+        <div class="field mb-4">
+          <label
+            for="password"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Password</label
+          >
+          <p-password
+            id="password"
+            formControlName="password"
+            [toggleMask]="true"
+            [feedback]="false"
+          ></p-password>
+        </div>
+
+        <div class="flex justify-between items-center mb-4">
+          <a href="#" class="text-sm text-primary-600 hover:underline"
+            >Forgot Password?</a
+          >
+        </div>
+
+        <button
+          pButton
+          type="submit"
+          label="Login"
+          class="w-full p-button-primary"
+        ></button>
+      </form>
+    </p-fluid>
+
+    <div class="mt-4 text-center">
+      <p class="text-sm text-gray-600">
+        Don't have an account?
+        <a routerLink="/auth/register" class="text-primary-600 hover:underline"
+          >Sign Up</a
+        >
+      </p>
+    </div>
+  </p-card>
+</div>
+<p-toast life="1500"></p-toast>
+
+<errors-alert [formErrors]="formErrors"></errors-alert>

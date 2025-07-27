@@ -1,0 +1,12 @@
+<p-toast position="top-center" closable="true" life="3000" key="formErrors">
+  <ng-template let-message #message>
+    <div class="flex flex-col items-start p-5 flex-auto">
+      <span class="text-lg font-bold">{{ message.summary }}</span>
+      <ul class="list-disc">
+        @for (item of formErrors() ; track $index) {
+        <li class="ml-2">{{ item }}</li>
+        }
+      </ul>
+    </div>
+  </ng-template>
+</p-toast>

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-auth',
+  selector: 'app-not-found',
   imports: [],
-  templateUrl: './auth.component.html',
+  templateUrl: './not-found.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuthComponent { }
+export default class NotFoundComponent { }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MenubarModule } from 'primeng/menubar';
-import { IconDirective } from '../../directives/icon.directive';
 import { ButtonModule } from 'primeng/button';
+import { IconDirective } from '../../../shared/directives/icon.directive';
 
 @Component({
   selector: 'app-navbar',
