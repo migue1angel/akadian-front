@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MenubarModule } from 'primeng/menubar';
 import { ButtonModule } from 'primeng/button';
-import { IconDirective } from '../../../shared/directives/icon.directive';
+import { IconDirective } from '../../shared/directives/icon.directive';
+import { AuthService } from '../../features/auth/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -11,6 +13,24 @@ import { IconDirective } from '../../../shared/directives/icon.directive';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
+  protected readonly authService = inject(AuthService);
+  protected readonly router = inject(Router);
+
+  toggleDarkMode() {
+    const element = document.querySelector('html');
+    element?.classList.toggle('my-app-dark');
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
+
+  protected get themeIcon() {
+    const element = document.querySelector('html');
+    return element?.classList.contains('my-app-dark') ? 'sun' : 'moon';
+  }
+
   protected items = [
     {
       label: 'Home',

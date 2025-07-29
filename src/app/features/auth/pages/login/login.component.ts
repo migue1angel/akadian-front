@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -16,6 +16,9 @@ import { Fluid } from 'primeng/fluid';
 import { MessageModule } from 'primeng/message';
 import { IconDirective } from '../../../../shared/directives/icon.directive';
 import { ErrorsAlertComponent } from '../../../../shared/components/errors-alert/errors-alert.component';
+import { CustomLabelDirective } from '../../../../shared/directives/custom-label.directive';
+import { AuthFormEnum } from '../../../../common/enums/auth-register-form.enum';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'auth-login',
@@ -29,41 +32,50 @@ import { ErrorsAlertComponent } from '../../../../shared/components/errors-alert
     ButtonModule,
     ToastModule,
     IconDirective,
-    Fluid,
     MessageModule,
-    ErrorsAlertComponent
-],
+    ErrorsAlertComponent,
+    CustomLabelDirective,
+  ],
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [MessageService],
 })
 export class LoginComponent {
-  protected form: FormGroup;
+  protected readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
+  private readonly messageService = inject(MessageService);
+  private readonly router = inject(Router);
+  protected readonly AuthFormEnum = AuthFormEnum;
+
   protected formErrors: string[] = [];
-
-  constructor(private fb: FormBuilder, private messageService: MessageService) {
-    this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-    });
-  }
-
+  protected form: FormGroup = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
+  });
 
   onSubmit() {
-    this.formErrors.push('Error 1', 'Error 2');
-    
     if (this.form.valid) {
-      console.log('Login Data:', this.form.value);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Bienvenido',
+      this.authService.login(this.form.value).then(() => {
+        this.router.navigate(['core']);
       });
     } else {
       this.messageService.add({
-        severity: 'secondary',
-        summary: 'El formulario no es válido',
-        key: 'formErrors'
+        severity: 'error',
+        summary: 'Form is invalid',
+        key: 'formErrors',
       });
     }
+  }
+
+  googleLogin() {
+    this.authService.googleLogin();
+  }
+
+  protected get email() {
+    return this.form.get('email');
+  }
+
+  protected get password() {
+    return this.form.get('password');
   }
 }

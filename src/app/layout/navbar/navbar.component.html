@@ -1,0 +1,19 @@
+<nav
+  class="h-14 border-b border-surface-200 dark:border-surface-700 flex justify-between items-center p-4"
+>
+  <div class="flex items-center gap-2 text-primary">
+    <span [appIcon]="'academicCap'" size="lg"></span>
+    <h1 class="text-2xl font-bold">AKADIAN</h1>
+  </div>
+  <div class="flex items-center gap-2">
+    <p-button size="small" severity="secondary" (click)="toggleDarkMode()">
+      <span [appIcon]="themeIcon" size="sm"></span>
+    </p-button>
+    <p-button label="Login" size="small">
+      <span [appIcon]="'user'" size="sm"></span
+    ></p-button>
+    <p-button label="logout" size="small" (click)="logout()">
+      <span [appIcon]="'signIn'" size="sm"></span
+    ></p-button>
+  </div>
+</nav>

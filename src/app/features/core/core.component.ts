@@ -1,9 +1,27 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AuthService } from '../auth/services/auth.service';
+import { UsersHttpService } from '../auth/services/users-http.service';
+import { NavbarComponent } from '../../layout/navbar/navbar.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-core',
-  imports: [],
+  imports: [NavbarComponent, RouterOutlet],
   templateUrl: './core.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CoreComponent { }
+export class CoreComponent {
+  private readonly authService = inject(AuthService);
+  private readonly usersHttpService = inject(UsersHttpService);
+
+  ngOnInit(): void {
+    this.usersHttpService.getProfile().subscribe({
+      next: (user) => {
+        console.log(user);
+      },
+      error: (error) => {
+        console.log(error.message, 'user not found');
+      },
+    });
+  }
+}

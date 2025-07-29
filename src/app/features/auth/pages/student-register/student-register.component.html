@@ -1,4 +1,4 @@
-<div class="px-6 py-20 md:px-12 lg:px-20">
+<div class="px-6 py-10 md:px-12 lg:px-20">
   <div
     class="p-8 md:p-12 shadow-xl bg-gray-50 dark:bg-surface-800 rounded-2xl w-full max-w-xl mx-auto flex flex-col gap-8 animate-fadein animate-duration-500"
   >
@@ -10,16 +10,16 @@
         <div
           class="text-primary text-2xl font-semibold leading-tight text-center w-full"
         >
-          Welcome Back
+          Welcome to Akadian
         </div>
         <div class="text-center w-full">
           <span class="text-contrast leading-normal"
-            >Don't have an account?</span
+            >Already have an account?</span
           >
           <a
-            routerLink="/auth/student-register"
+            routerLink="/auth/login"
             class="text-primary font-medium ml-1 cursor-pointer hover:text-primary-emphasis"
-            >Create today!</a
+            >Login!</a
           >
         </div>
       </div>
@@ -32,12 +32,25 @@
       class="flex flex-col gap-6 w-full"
     >
       <div class="flex flex-col gap-2">
+        <label
+          appCustomLabel
+          [label]="AuthFormEnum.username"
+          for="username"
+        ></label>
+        <input pInputText formControlName="username" id="username" />
+      </div>
+
+      <div class="flex flex-col gap-2">
         <label appCustomLabel [label]="AuthFormEnum.email" for="email"></label>
         <input pInputText formControlName="email" id="email" />
       </div>
 
       <div class="flex flex-col gap-2">
-        <label appCustomLabel [label]="AuthFormEnum.password" for="password"></label>
+        <label
+          appCustomLabel
+          [label]="AuthFormEnum.password"
+          for="password"
+        ></label>
         <p-password
           [fluid]="true"
           formControlName="password"
@@ -45,26 +58,32 @@
           [feedback]="false"
           id="password"
         />
+      </div>
 
-        <!-- <input pInputText formControlName="password" id="password" /> -->
+      <div class="flex flex-col gap-2">
+        <label
+          appCustomLabel
+          [label]="AuthFormEnum.confirmPassword"
+          for="confirmPassword"
+        ></label>
+        <p-password
+          [fluid]="true"
+          formControlName="confirmPassword"
+          [toggleMask]="true"
+          [feedback]="false"
+          id="confirmPassword"
+        />
       </div>
 
       <!--  -->
-      <div class="flex justify-end w-full">
-        <a 
-         (click)="authService.sendPasswordResetEmail(email?.value)"
-          class="text-primary font-medium cursor-pointer hover:text-primary-emphasis"
-          >Forgot your password?</a
-        >
-      </div>
-      <p-button [fluid]="true" type="submit" label="Sign In" />
+      <p-button [fluid]="true" type="submit" label="Register" />
       <p-button
         [fluid]="true"
         type="button"
         label="Continue with Google"
         (click)="googleLogin()"
       >
-        <span [appIcon]="'google'" ></span>
+        <span [appIcon]="'google'" size="xs"></span>
       </p-button>
     </form>
   </div>
