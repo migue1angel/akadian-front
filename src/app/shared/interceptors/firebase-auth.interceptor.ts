@@ -1,6 +1,7 @@
 import type { HttpInterceptorFn } from '@angular/common/http';
-import { from, switchMap, catchError } from 'rxjs';
+import { from, switchMap, catchError, filter, fromEventPattern, take } from 'rxjs';
 import { getFirebaseUser } from '../../features/auth/utils/auth-token.util';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 
 export const firebaseAuthInterceptor: HttpInterceptorFn = (req, next) => {
   return from(getFirebaseUser()).pipe(
@@ -27,3 +28,4 @@ export const firebaseAuthInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
+

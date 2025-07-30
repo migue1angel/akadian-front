@@ -3,11 +3,11 @@ import { MenubarModule } from 'primeng/menubar';
 import { ButtonModule } from 'primeng/button';
 import { IconDirective } from '../../shared/directives/icon.directive';
 import { AuthService } from '../../features/auth/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MenubarModule, IconDirective, ButtonModule],
+  imports: [MenubarModule, IconDirective, ButtonModule, RouterLink],
   templateUrl: './navbar.component.html',
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,

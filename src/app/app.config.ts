@@ -15,7 +15,7 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import './features/auth/firebase/firebase'; // Importar configuración de Firebase
-import { firebaseAuthInterceptor } from './common/interceptors/firebase-auth.interceptor';
+import { firebaseAuthInterceptor } from './shared/interceptors/firebase-auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [

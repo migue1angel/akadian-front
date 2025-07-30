@@ -1,78 +1,109 @@
+import { inject, Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
 import {
   createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
   sendEmailVerification,
-  sendPasswordResetEmail,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
   updateProfile,
+  User as FirebaseUser,
 } from 'firebase/auth';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
-import { RegisterModel, UserModel } from '../models/register.model';
-import { initializeApp } from 'firebase/app';
+import { RegisterModel } from '../models/register.model';
 import { LoginModel } from '../models/login.model';
+import { UserModel } from '../models/user.model';
+import { UsersHttpService } from './users-http.service';
+import { ServerResponse } from '../../../shared/models/server.response';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private googleAuthProvider = new GoogleAuthProvider();
-  private auth = getAuth();
+  private readonly auth = getAuth();
   private readonly http = inject(HttpClient);
+  private readonly userHttpService = inject(UsersHttpService);
+  private readonly googleProvider = new GoogleAuthProvider();
   private readonly apiURL = environment.apiURL;
 
+  private readonly _user = signal<UserModel | null>(null);
+  public readonly user = computed(() => this._user());
+
   constructor() {
-    onAuthStateChanged(this.auth, (user) => {});
+    this.listenToAuthChanges();
   }
 
-  async register(registerModel: RegisterModel) {
+  async register(model: RegisterModel) {
+    const { email, password, username } = model;
     const userCredential = await createUserWithEmailAndPassword(
       this.auth,
-      registerModel.email,
-      registerModel.password
+      email,
+      password
     );
     const user = userCredential.user;
-    await updateProfile(user, { displayName: registerModel.username });
-    const userData = {
-      displayName: user.displayName,
-      email: user.email,
-      uid: user.uid,
-      profileImage: user.photoURL,
-    };
-    await sendEmailVerification(user);
-    console.log(userData);
 
-    return this.http.post(`${this.apiURL}/auth/register`, userData);
+    if (!user) throw new Error('User registration failed');
+
+    await updateProfile(user, { displayName: username });
+    await sendEmailVerification(user);
+
+    const userData = this.mapFirebaseUserToDTO(user);
+    return firstValueFrom(
+      this.http.post<ServerResponse>(`${this.apiURL}/auth/register`, userData)
+    );
   }
 
-  async login(loginModel: LoginModel) {
-    const userCredential = await signInWithEmailAndPassword(
-      this.auth,
-      loginModel.email,
-      loginModel.password
-    );
-    const user = userCredential.user;
-    // return this.http.post(`${this.apiURL}/auth/login`, userData);
+  async login(model: LoginModel) {
+    const { email, password } = model;
+    return signInWithEmailAndPassword(this.auth, email, password);
   }
 
   async googleLogin() {
-    const userCredential = await signInWithPopup(
-      this.auth,
-      this.googleAuthProvider
+    const { user } = await signInWithPopup(this.auth, this.googleProvider);
+    const userData = this.mapFirebaseUserToDTO(user);
+    return firstValueFrom(
+      this.http.post(`${this.apiURL}/auth/google-login`, userData)
     );
-    const user = userCredential.user;
-    // return this.http.post(`${this.apiURL}/auth/login`, userData);
   }
+
   async logout() {
-    await signOut(this.auth);
+    return signOut(this.auth);
   }
 
   async sendPasswordResetEmail(email: string) {
-    await sendPasswordResetEmail(this.auth, email);
+    return firebaseSendPasswordResetEmail(this.auth, email);
+  }
+
+  async getUserProfile() {
+    const profile = await firstValueFrom(this.userHttpService.getProfile());
+    this._user.set(profile);
+  }
+
+  private listenToAuthChanges() {
+    onAuthStateChanged(this.auth, async (user) => {
+      if (!user) {
+        this._user.set(null);
+        return;
+      }
+      try {
+        await this.getUserProfile();
+      } catch {
+        this._user.set(null);
+      }
+    });
+  }
+
+  private mapFirebaseUserToDTO(user: FirebaseUser) {
+    return {
+      username: user.displayName,
+      email: user.email,
+      firebaseId: user.uid,
+      profileImage: user.photoURL,
+    };
   }
 }

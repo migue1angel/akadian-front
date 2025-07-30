@@ -16,6 +16,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    loadComponent: () => import('./shared/pages/not-found/not-found.component'),
+    loadComponent: () => import('./common/pages/not-found/not-found.component'),
   },
 ];

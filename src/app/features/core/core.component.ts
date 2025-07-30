@@ -11,17 +11,5 @@ import { RouterOutlet } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CoreComponent {
-  private readonly authService = inject(AuthService);
-  private readonly usersHttpService = inject(UsersHttpService);
-
-  ngOnInit(): void {
-    this.usersHttpService.getProfile().subscribe({
-      next: (user) => {
-        console.log(user);
-      },
-      error: (error) => {
-        console.log(error.message, 'user not found');
-      },
-    });
-  }
+  
 }

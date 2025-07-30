@@ -9,11 +9,20 @@
     <p-button size="small" severity="secondary" (click)="toggleDarkMode()">
       <span [appIcon]="themeIcon" size="sm"></span>
     </p-button>
-    <p-button label="Login" size="small">
+    @if (authService.user()) {
+
+    <p-button size="small">
       <span [appIcon]="'user'" size="sm"></span
-    ></p-button>
+      >{{ authService.user()?.username }}</p-button
+    >
     <p-button label="logout" size="small" (click)="logout()">
       <span [appIcon]="'signIn'" size="sm"></span
     ></p-button>
+    }@else {
+
+    <p-button label="Login" size="small" routerLink="/auth/login">
+      <span [appIcon]="'user'" size="sm"></span
+    ></p-button>
+    }
   </div>
 </nav>

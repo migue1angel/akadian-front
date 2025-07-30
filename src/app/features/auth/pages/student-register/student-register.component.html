@@ -38,11 +38,23 @@
           for="username"
         ></label>
         <input pInputText formControlName="username" id="username" />
+        <span
+          appErrorMessage
+          [touched]="usernameField.touched"
+          [dirty]="usernameField.dirty"
+          [errors]="usernameField.errors"
+        ></span>
       </div>
 
       <div class="flex flex-col gap-2">
         <label appCustomLabel [label]="AuthFormEnum.email" for="email"></label>
         <input pInputText formControlName="email" id="email" />
+        <span
+          appErrorMessage
+          [touched]="emailField.touched"
+          [dirty]="emailField.dirty"
+          [errors]="emailField.errors"
+        ></span>
       </div>
 
       <div class="flex flex-col gap-2">
@@ -58,6 +70,12 @@
           [feedback]="false"
           id="password"
         />
+        <span
+          appErrorMessage
+          [touched]="passwordField.touched"
+          [dirty]="passwordField.dirty"
+          [errors]="passwordField.errors"
+        ></span>
       </div>
 
       <div class="flex flex-col gap-2">
@@ -73,7 +91,17 @@
           [feedback]="false"
           id="confirmPassword"
         />
+        <span
+          appErrorMessage
+          [touched]="confirmPasswordField.touched"
+          [dirty]="confirmPasswordField.dirty"
+          [errors]="confirmPasswordField.errors"
+        ></span>
       </div>
+
+      @if (confirmPasswordField.touched && form.hasError('passwordsNotEqual')) {
+      <span class="text-primary text-sm"> Passwords do not match. </span>
+      }
 
       <!--  -->
       <p-button [fluid]="true" type="submit" label="Register" />
@@ -89,4 +117,4 @@
   </div>
 </div>
 
-<errors-alert [formErrors]="formErrors" />
+<app-spinner [loading]="loading()"></app-spinner>

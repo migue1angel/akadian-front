@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,12 +17,10 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { Fluid } from 'primeng/fluid';
 import { MessageModule } from 'primeng/message';
 import { IconDirective } from '../../../../shared/directives/icon.directive';
-import { ErrorsAlertComponent } from '../../../../shared/components/errors-alert/errors-alert.component';
 import { CustomLabelDirective } from '../../../../shared/directives/custom-label.directive';
-import { AuthFormEnum } from '../../../../common/enums/auth-register-form.enum';
+import { AuthFormEnum } from '../../../../shared/enums/fields.enum';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -33,7 +36,6 @@ import { AuthService } from '../../services/auth.service';
     ToastModule,
     IconDirective,
     MessageModule,
-    ErrorsAlertComponent,
     CustomLabelDirective,
   ],
   templateUrl: './login.component.html',
@@ -46,25 +48,35 @@ export class LoginComponent {
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
   protected readonly AuthFormEnum = AuthFormEnum;
+  protected loading = signal<boolean>(false);
 
-  protected formErrors: string[] = [];
   protected form: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
 
   onSubmit() {
-    if (this.form.valid) {
-      this.authService.login(this.form.value).then(() => {
-        this.router.navigate(['core']);
-      });
-    } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Form is invalid',
-        key: 'formErrors',
-      });
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      console.log(this.form.errors);
+      
+      return;
     }
+    this.loading.set(true);
+    this.authService
+      .login(this.form.value)
+      .then(() => {
+        this.loading.set(false);
+        this.router.navigate(['core']);
+      })
+      .catch((error) => {
+        console.error('Login error:', error.message);
+        this.loading.set(false);
+        this.messageService.add({
+          severity: 'error',
+          detail: error.message,
+        });
+      });
   }
 
   googleLogin() {
