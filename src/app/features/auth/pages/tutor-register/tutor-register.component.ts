@@ -98,6 +98,7 @@ export default class TutorRegisterComponent implements OnInit {
     this.loading.set(true);
     try {
       await this.authService.googleLogin();
+      await this.authService.getUserProfile();
       this.router.navigate(['/core']);
     } catch (error: any) {
       this.showError(

@@ -40,6 +40,7 @@ export class AuthService {
 
   async register(model: RegisterModel) {
     const { email, password, username } = model;
+
     const userCredential = await createUserWithEmailAndPassword(
       this.auth,
       email,
@@ -47,15 +48,21 @@ export class AuthService {
     );
     const user = userCredential.user;
 
-    if (!user) throw new Error('User registration failed');
+    if (!user) throw new Error('Fallo al crear el usuario en Firebase');
 
-    await updateProfile(user, { displayName: username });
-    await sendEmailVerification(user);
+    try {
+      await updateProfile(user, { displayName: username });
+      await sendEmailVerification(user);
 
-    const userData = this.mapFirebaseUserToDTO(user);
-    return firstValueFrom(
-      this.http.post<ServerResponse>(`${this.apiURL}/auth/register`, userData)
-    );
+      const userData = this.mapFirebaseUserToDTO(user);
+
+      await firstValueFrom(
+        this.http.post<ServerResponse>(`${this.apiURL}/auth/register`, userData)
+      );
+    } catch (error) {
+      await user.delete();
+      throw error;
+    }
   }
 
   async login(model: LoginModel) {
@@ -64,11 +71,16 @@ export class AuthService {
   }
 
   async googleLogin() {
-    const { user } = await signInWithPopup(this.auth, this.googleProvider);
-    const userData = this.mapFirebaseUserToDTO(user);
-    return firstValueFrom(
-      this.http.post(`${this.apiURL}/auth/google-login`, userData)
-    );
+    try {
+      const credential = await signInWithPopup(this.auth, this.googleProvider);
+      const userData = this.mapFirebaseUserToDTO(credential.user);
+      return firstValueFrom(
+        this.http.post(`${this.apiURL}/auth/google-login`, userData)
+      );
+    } catch (error) {
+      this.auth.currentUser?.delete();
+      throw error;
+    }
   }
 
   async logout() {

@@ -59,7 +59,7 @@ export class LoginComponent {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       console.log(this.form.errors);
-      
+
       return;
     }
     this.loading.set(true);
@@ -79,8 +79,23 @@ export class LoginComponent {
       });
   }
 
-  googleLogin() {
-    this.authService.googleLogin();
+  async googleLogin(): Promise<void> {
+    this.loading.set(true);
+    try {
+      await this.authService.googleLogin();
+      await this.authService.getUserProfile();
+      this.router.navigate(['/core']);
+    } catch (error: any) {
+      this.showError(
+        'Google Login Error',
+        error?.message || 'Error signing in with Google'
+      );
+    } finally {
+      this.loading.set(false);
+    }
+  }
+  private showError(summary: string, detail: string): void {
+    this.messageService.add({ severity: 'error', summary, detail });
   }
 
   protected get email() {

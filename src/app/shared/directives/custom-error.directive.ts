@@ -7,6 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ValidationErrors } from '@angular/forms';
+import { FormUtils } from '../utils/form.utils';
 
 @Directive({
   selector: '[appErrorMessage]',
@@ -61,7 +62,17 @@ export class ErrorMessageDirective implements OnInit {
       return;
     }
     if (errorKeys.includes('pattern')) {
-      this.element.innerText = 'Invalid format';
+      const requiredPattern = errors['pattern']['requiredPattern'];
+
+      if (
+        requiredPattern === FormUtils.passwordPattern
+      ) {
+        this.element.innerText =
+          'Password must contain at least 6 characters, one uppercase letter, one lowercase letter, and one number';
+      } else {
+        this.element.innerText = 'Invalid format';
+      }
+
       return;
     }
 
